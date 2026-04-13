@@ -1,98 +1,147 @@
+# 🚢 ColTrade Backend - Sistema de Gestión de Comercio Exterior
+
+![ColTrade Banner](https://raw.githubusercontent.com/NeiferDaviesHinestrozaMosquera-code/ColTrade-Backend/main/dist/assets/banner.png) <!-- Nota: Se sugiere subir una imagen de banner similar a la seleccionada -->
+
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+**ColTrade-Backend** es una infraestructura robusta y escalable diseñada para centralizar y optimizar las operaciones de comercio exterior. Construido con **NestJS** y **Prisma**, este backend proporciona una API potente para la gestión de importaciones, exportaciones, logística y cumplimiento normativo.
+
+---
+
+## 🚀 Características Principales
+
+| Módulo | Descripción |
+| :--- | :--- |
+| **Multi-Tenant** | Soporte para múltiples empresas con planes de suscripción (Free, Pro, Pymes, Empresarial). |
+| **Gestión de Operaciones** | Seguimiento detallado de importaciones y exportaciones en tiempo real. |
+| **Logística Integrada** | Control de estados de envío, BL, códigos Nandina y destinos internacionales. |
+| **Sistema de Soporte** | Gestión de tickets con prioridades y estados para atención al cliente. |
+| **Academia ColTrade** | Módulos y lecciones integradas para capacitación en comercio exterior. |
+| **Seguridad Avanzada** | Autenticación basada en JWT con roles definidos (Admin, Operator, Viewer). |
+
+---
+
+## 🛠️ Stack Tecnológico
+
+- **Framework:** [NestJS](https://nestjs.com/) - Framework progresivo de Node.js.
+- **Lenguaje:** [TypeScript](https://www.typescriptlang.org/) - Tipado estático para mayor robustez.
+- **ORM:** [Prisma](https://www.prisma.io/) - Modelado de datos y consultas simplificadas.
+- **Base de Datos:** [PostgreSQL](https://www.postgresql.org/) (vía [Supabase](https://supabase.com/)).
+- **Herramientas:** ESLint, Prettier, Jest para pruebas unitarias y E2E.
+
+---
+
+## 📂 Estructura del Proyecto
+
+```text
+src/
+├── common/         # Decoradores, filtros y utilidades compartidas
+├── config/         # Configuraciones globales y variables de entorno
+├── modules/        # Módulos funcionales de la aplicación
+│   ├── auth/       # Lógica de autenticación y seguridad
+│   └── operations/ # Gestión de importaciones/exportaciones
+├── prisma/         # Cliente de Prisma y servicios de BD
+└── supabase/       # Integración con servicios de Supabase
+```
+
+---
+
+## ⚙️ Configuración e Instalación
+
+### Requisitos Previos
+- Node.js (v18 o superior)
+- NPM o PNPM
+- Instancia de PostgreSQL (o proyecto en Supabase)
+
+### Instalación
+1. Clonar el repositorio:
+   ```bash
+   git clone https://github.com/NeiferDaviesHinestrozaMosquera-code/ColTrade-Backend.git
+   cd ColTrade-Backend
+   ```
+
+2. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+
+3. Configurar variables de entorno:
+   Crea un archivo `.env` basado en `.env.example`:
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/coltrade"
+   JWT_SECRET="tu_secreto_super_seguro"
+   ```
+
+4. Ejecutar migraciones de Prisma:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+---
+
+## 🏃 Ejecución
+
+```bash
+# Desarrollo
+npm run start:dev
+
+# Producción
+npm run build
+npm run start:prod
+```
+
+---
+
+## 🧪 Pruebas
+
+El proyecto incluye una suite completa de pruebas para garantizar la estabilidad:
+
+```bash
+# Pruebas unitarias
+npm run test
+
+# Pruebas E2E
+npm run test:e2e
+
+# Cobertura de código
+npm run test:cov
+```
+
+---
+
+## 📊 Diagrama de Base de Datos
+
+El sistema utiliza un esquema relacional complejo gestionado por Prisma. A continuación se detallan las entidades principales:
+
+- **Tenants:** Empresas registradas en la plataforma.
+- **Users:** Personal administrativo y operativo.
+- **Operations:** El núcleo del negocio (Import/Export).
+- **Documents:** Archivos adjuntos y certificados.
+- **Support:** Tickets y comunicación de ayuda.
+
+---
+
+## 🤝 Contribuciones
+
+1. Haz un **Fork** del proyecto.
+2. Crea una nueva rama (`git checkout -b feature/NuevaFuncionalidad`).
+3. Realiza tus cambios y haz **Commit** (`git commit -m 'Añadir nueva funcionalidad'`).
+4. Sube los cambios a tu rama (`git push origin feature/NuevaFuncionalidad`).
+5. Abre un **Pull Request**.
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+---
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  Desarrollado con ❤️ por <a href="https://github.com/NeiferDaviesHinestrozaMosquera-code">Neifer Davies Hinestroza Mosquera</a>
 </p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
