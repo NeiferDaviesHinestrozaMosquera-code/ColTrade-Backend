@@ -1,0 +1,64 @@
+@baseUrl = http://localhost:3000/api/v1
+
+### 1. Health Check
+GET {{baseUrl}}/auth/health
+Accept: application/json
+
+### 2. Registrar Usuario
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Password123!",
+  "fullName": "Test User",
+  "tenantSlug": "test-company",
+  "tenantName": "Test Company"
+}
+
+### 3. Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Password123!"
+}
+
+### Extraer Token del Login
+@token = {{login.response.body.accessToken}}
+
+### 4. Obtener Perfil (Me)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 5. Crear Operación (Operations)
+# @name createOperation
+POST {{baseUrl}}/operations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "IMPORT",
+  "reference": "IMP-001",
+  "value": 15000.50,
+  "currency": "USD"
+}
+
+### 6. Listar Operaciones
+GET {{baseUrl}}/operations?page=1&limit=10
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 7. Generar PDF de una operación (Asume ID 1 u otro UUID, reemplaza :id)
+# Asegúrate de extraer el id de la creación
+@opId = {{createOperation.response.body.id}}
+POST {{baseUrl}}/operations/{{opId}}/generate-pdf
+Authorization: Bearer {{token}}
+
+### 8. Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}

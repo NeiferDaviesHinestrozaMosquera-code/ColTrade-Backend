@@ -1,0 +1,327 @@
+// ColTrade Backend — Prisma Schema (PostgreSQL / Supabase)
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public"]
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum PlanTier {
+  FREE
+  PRO
+  PYMES
+  EMPRESARIAL
+  @@schema("public")
+}
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  VIEWER
+  @@schema("public")
+}
+
+enum OperationType {
+  IMPORT
+  EXPORT
+  @@schema("public")
+}
+
+enum OperationStatus {
+  PENDING
+  IN_TRANSIT
+  AT_CUSTOMS
+  DELIVERED
+  CANCELLED
+  @@schema("public")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  @@schema("public")
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+  @@schema("public")
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ALERT
+  SYSTEM
+  @@schema("public")
+}
+
+// ─── Core: Tenants & Users ───────────────────────────────────────────────────
+
+model Tenant {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  nit           String?
+  logoUrl       String?
+  planTier      PlanTier @default(FREE)
+  stripeCustomerId String? @unique
+  stripeSubscriptionId String? @unique
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  operations    Operation[]
+  tickets       SupportTicket[]
+  erpApiKeys    ErpApiKey[]
+  notifications TenantNotification[]
+  trmRates      TrmRate[]
+  academyProgress AcademyProgress[]
+
+  @@map("tenants")
+  @@schema("public")
+}
+
+model User {
+  id            String   @id  // Supabase Auth UID
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email         String   @unique
+  fullName      String?
+  avatarUrl     String?
+  role          UserRole @default(OPERATOR)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  operations    Operation[]
+  tickets       SupportTicket[]
+  academyProgress AcademyProgress[]
+  nandinaHistory NandinaQuery[]
+
+  @@index([tenantId])
+  @@map("users")
+  @@schema("public")
+}
+
+// ─── Operations / Logistics ──────────────────────────────────────────────────
+
+model Operation {
+  id              String          @id @default(uuid())
+  tenantId        String
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  type            OperationType
+  status          OperationStatus @default(PENDING)
+  blNumber        String?
+  nandinaCode     String?
+  declarantId     String?
+  originCountry   String?
+  destCountry     String?
+  valueUsd        Decimal?        @db.Decimal(15, 2)
+  weightKg        Decimal?        @db.Decimal(10, 3)
+  description     String?
+  customsPort     String?
+  eta             DateTime?
+  pdfUrl          String?
+  metadata        Json?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  documents       Document[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("operations")
+  @@schema("public")
+}
+
+model Document {
+  id            String    @id @default(uuid())
+  operationId   String
+  operation     Operation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  name          String
+  fileUrl       String
+  fileType      String
+  sizeBytes     Int
+  createdAt     DateTime  @default(now())
+
+  @@index([operationId])
+  @@map("documents")
+  @@schema("public")
+}
+
+// ─── NANDINA Classifier ──────────────────────────────────────────────────────
+
+model NandinaQuery {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  inputText     String
+  resultCode    String?
+  resultDesc    String?
+  confidence    Float?
+  rawResponse   Json?
+  cached        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@map("nandina_queries")
+  @@schema("public")
+}
+
+// ─── Academy ─────────────────────────────────────────────────────────────────
+
+model AcademyModule {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  order       Int
+  imageUrl    String?
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+
+  lessons     AcademyLesson[]
+
+  @@map("academy_modules")
+  @@schema("public")
+}
+
+model AcademyLesson {
+  id          String        @id @default(uuid())
+  moduleId    String
+  module      AcademyModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  content     String
+  videoUrl    String?
+  order       Int
+  durationMin Int?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  quizQuestions QuizQuestion[]
+
+  @@index([moduleId])
+  @@map("academy_lessons")
+  @@schema("public")
+}
+
+model QuizQuestion {
+  id          String        @id @default(uuid())
+  lessonId    String
+  lesson      AcademyLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  question    String
+  options     Json          // String[]
+  correctIdx  Int
+  explanation String?
+  order       Int
+
+  @@index([lessonId])
+  @@map("quiz_questions")
+  @@schema("public")
+}
+
+model AcademyProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  lessonId    String
+  completed   Boolean  @default(false)
+  score       Int?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, lessonId])
+  @@index([tenantId])
+  @@map("academy_progress")
+  @@schema("public")
+}
+
+// ─── Support Tickets ─────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id          String         @id @default(uuid())
+  tenantId    String
+  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User           @relation(fields: [userId], references: [id])
+  title       String
+  description String
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  resolvedAt  DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("support_tickets")
+  @@schema("public")
+}
+
+// ─── TRM (Tasa de Cambio) ────────────────────────────────────────────────────
+
+model TrmRate {
+  id          String   @id @default(uuid())
+  tenantId    String?
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
+  currency    String   @default("USD")
+  rateCol     Decimal  @db.Decimal(12, 4)
+  validDate   DateTime @db.Date
+  source      String   @default("superfinanciera")
+  createdAt   DateTime @default(now())
+
+  @@unique([currency, validDate])
+  @@map("trm_rates")
+  @@schema("public")
+}
+
+// ─── ERP Integration ─────────────────────────────────────────────────────────
+
+model ErpApiKey {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  keyHash     String   @unique
+  keyPrefix   String   // Primeros 8 chars para mostrar en UI
+  lastUsedAt  DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+  @@map("erp_api_keys")
+  @@schema("public")
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────────
+
+model TenantNotification {
+  id          String           @id @default(uuid())
+  tenantId    String
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  type        NotificationType @default(INFO)
+  title       String
+  message     String
+  isRead      Boolean          @default(false)
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+
+  @@index([tenantId, isRead])
+  @@map("tenant_notifications")
+  @@schema("public")
+}
+
