@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+npm-debug.log
+yarn-error.log
+coverage/
+coltrade-frontend/node_modules/
+coltrade-frontend/.next/
+coltrade-frontend/out/
+coltrade-frontend/build/
+.DS_Store
